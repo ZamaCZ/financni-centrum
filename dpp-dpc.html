@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limity DPP a DPČ 2026 — kdy se z dohody platí pojistné — Finanční centrum</title>
+<meta name="description" content="Zadej výdělek z dohody a hned víš, jestli se platí sociální a zdravotní pojištění. Limity 2026: DPP do 11 999 Kč, DPČ do 4 499 Kč měsíčně u jednoho zaměstnavatele.">
+<meta property="og:title" content="Limity DPP a DPČ 2026 — kdy se z dohody platí pojistné">
+<meta property="og:description" content="DPP do 11 999 Kč, DPČ do 4 499 Kč měsíčně bez pojistného. Zadej částku a ověř si to.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/base.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jaké jsou limity DPP a DPČ v roce 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "U dohody o provedení práce (DPP) se v roce 2026 pojistné neplatí do 11 999 Kč hrubého měsíčně u jednoho zaměstnavatele, u dohody o pracovní činnosti (DPČ) do 4 499 Kč. Od 12 000 Kč (DPP), resp. 4 500 Kč (DPČ) se platí sociální a zdravotní pojištění z celé částky." }
+    },
+    {
+      "@type": "Question",
+      "name": "Co se stane při překročení limitu dohody?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Pojistné se platí z celé odměny, ne jen z části nad limit: zaměstnanec odvede 4,5 % na zdravotní a 7,1 % na sociální pojištění, zaměstnavatel dalších 33,8 %. Zároveň ale vzniká účast na nemocenském a důchodovém pojištění — měsíc se počítá do důchodu." }
+    },
+    {
+      "@type": "Question",
+      "name": "Sčítají se příjmy z více dohod?",
+      "acceptedAnswer": { "@type": "Answer", "text": "U jednoho zaměstnavatele se příjmy ze všech dohod stejného typu v měsíci sčítají. Dohody u různých zaměstnavatelů se posuzují každá zvlášť." }
+    },
+    {
+      "@type": "Question",
+      "name": "Jak je to u dohod s daní z příjmu?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Daň z příjmu se řeší nezávisle na limitu pojistného. Bez podepsaného prohlášení k dani se z malých odměn strhne 15% srážková daň. S prohlášením se uplatní sleva na poplatníka 2 570 Kč měsíčně, takže daň u menších výdělků často vyjde nulová." }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <nav class="site-nav">
+    <a class="brand" href="index.html">
+      <span class="brand-name">Finanční centrum</span>
+      <span class="brand-seal">2026</span>
+    </a>
+    <div class="site-nav-links">
+      <a href="index.html">Kalkulačky</a>
+      <a href="cista-mzda.html">Čistá mzda</a>
+      <a href="dpp-dpc.html" class="active">DPP/DPČ</a>
+    </div>
+  </nav>
+
+  <header class="masthead">
+    <h1>Limity DPP a DPČ 2026</h1>
+    <p class="subtitle">Zadej hrubou měsíční odměnu z dohody a hned víš, jestli se z ní platí sociální a zdravotní pojištění — a kolik ti do limitu ještě zbývá.</p>
+  </header>
+
+  <div class="calc-layout">
+    <form class="panel" id="formDohoda">
+      <div class="field">
+        <label>Typ dohody</label>
+        <div class="tabs" style="margin-bottom:0;" role="group" aria-label="Typ dohody">
+          <button type="button" id="typDPP" aria-selected="true">DPP</button>
+          <button type="button" id="typDPC" aria-selected="false">DPČ</button>
+        </div>
+        <span class="hint" id="typPopis">Dohoda o provedení práce — max. 300 hodin ročně u jednoho zaměstnavatele.</span>
+      </div>
+      <div class="field">
+        <label for="castka">Hrubá odměna za měsíc</label>
+        <input type="number" id="castka" min="0" step="100" value="8000" inputmode="numeric">
+        <span class="hint">Máš u stejného zaměstnavatele víc dohod stejného typu? Sečti je — posuzují se dohromady.</span>
+      </div>
+    </form>
+
+    <div class="panel">
+      <span class="result-label" id="verdiktLabel">Výsledek</span>
+      <div class="result-verdict" id="verdikt">—</div>
+      <span class="status-stamp" id="stamp">—</span>
+
+      <div class="gauge" style="margin-top:16px;">
+        <div class="gauge-fill status-ok" id="gaugeFill" style="width:0%"></div>
+        <div class="gauge-limit-mark" id="gaugeMark"></div>
+      </div>
+      <div class="gauge-numbers">
+        <span id="gCastka">—</span>
+        <span class="gauge-limit-label" id="gLimit">/ —</span>
+      </div>
+
+      <div class="rrow" id="rZbyvaRow"><span class="lbl" id="rZbyvaLbl">Do limitu zbývá</span><span class="leader"></span><span class="amt" id="rZbyva">—</span></div>
+
+      <div id="odvodyBox" hidden>
+        <div class="rrow"><span class="lbl">Zdravotní pojištění (4,5 %)</span><span class="leader"></span><span class="amt minus" id="rZdravotni">—</span></div>
+        <div class="rrow"><span class="lbl">Sociální pojištění (7,1 %)</span><span class="leader"></span><span class="amt minus" id="rSocialni">—</span></div>
+        <div class="rrow total"><span class="lbl">Z odměny zbyde <span class="poznamka">(před daní z příjmu)</span></span><span class="leader"></span><span class="amt" id="rZbyde">—</span></div>
+        <div class="rrow"><span class="lbl">Zaměstnavatele stojíš celkem <span class="poznamka">(+33,8 %)</span></span><span class="leader"></span><span class="amt" id="rZamestnavatel">—</span></div>
+        <div class="note note-info" style="margin-top:12px;">Není to jen ztráta: s pojistným vzniká účast na nemocenském a důchodovém pojištění — měsíc se ti počítá do důchodu a máš nárok na nemocenskou.</div>
+      </div>
+      <div class="note" id="prekroceniNote" hidden>Pojistné se platí <strong>z celé odměny</strong>, ne jen z části nad limit. Přeskočení limitu o korunu tak reálně znamená o dost nižší čistý výdělek.</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Jak limity dohod fungují</h2>
+  <div class="panel">
+    <p style="margin-top:0;">U dohod konaných mimo pracovní poměr se sociální a zdravotní pojištění neplatí, dokud hrubá odměna v kalendářním měsíci nedosáhne rozhodné částky. Ta se každý rok mění — pro rok 2026 je odvozená z průměrné mzdy 48 967 Kč:</p>
+    <div class="table-wrap" style="border:none;">
+      <table class="rates-table">
+        <thead><tr><th>Dohoda</th><th>Bez pojistného</th><th>Pojistné se platí od</th></tr></thead>
+        <tbody id="limityBody"></tbody>
+      </table>
+    </div>
+    <p style="margin-bottom:0;">Limity platí <strong>u jednoho zaměstnavatele</strong> — příjmy z dohod stejného typu u téhož zaměstnavatele se v měsíci sčítají, dohody u různých zaměstnavatelů se posuzují zvlášť. Chceš víc brigád hlídat průběžně? Na to bude navazovat samostatný tracker.</p>
+  </div>
+
+  <h2 class="section-title">Časté otázky</h2>
+  <details>
+    <summary>Co se stane, když limit překročím?</summary>
+    <p>Pojistné se platí z celé odměny, ne jen z části nad limit: tobě se strhne 4,5 % na zdravotní a 7,1 % na sociální pojištění, zaměstnavatel zaplatí dalších 33,8 %. Výměnou vzniká účast na nemocenském a důchodovém pojištění — měsíc se ti počítá do důchodu a máš nárok na nemocenskou.</p>
+  </details>
+  <details>
+    <summary>Sčítají se příjmy z více dohod?</summary>
+    <p>U jednoho zaměstnavatele ano — všechny dohody stejného typu (DPP zvlášť, DPČ zvlášť) se v měsíci sečtou a limit se posuzuje ze součtu. Dohody u různých zaměstnavatelů se posuzují každá zvlášť, takže dvě DPP po <span data-fill="dppPriklad"></span> u dvou různých firem jsou stále bez pojistného.</p>
+  </details>
+  <details>
+    <summary>Jak je to s daní z příjmu?</summary>
+    <p>Daň se řeší nezávisle na limitu pojistného a platí se vždy. Bez podepsaného prohlášení k dani („růžovky“) se z malých odměn strhne 15% srážková daň. S prohlášením se uplatní sleva na poplatníka 2 570 Kč měsíčně — u menších výdělků pak daň vyjde nulová. Kolik ti zbyde z běžné mzdy, spočítá <a href="cista-mzda.html">kalkulačka čisté mzdy</a>.</p>
+  </details>
+  <details>
+    <summary>Jaký je rozdíl mezi DPP a DPČ?</summary>
+    <p>DPP (dohoda o provedení práce) je omezená 300 hodinami ročně u jednoho zaměstnavatele a má vyšší limit pro pojistné (<span data-fill="dppLimit"></span> měsíčně). DPČ (dohoda o pracovní činnosti) může být v průměru až na půl úvazku, ale pojistné se platí už od <span data-fill="dpcOd"></span> měsíčně.</p>
+  </details>
+
+  <footer class="disclaimer">
+    Kalkulačka je orientační a nenahrazuje daňové ani právní poradenství. Rozhodné částky platí pro rok 2026 (DPP od 12 000 Kč, DPČ od 4 500 Kč — odvozeno z průměrné mzdy 48 967 Kč dle nařízení vlády č. 365/2025 Sb.) a každý rok se mění. Nezohledňuje souběh dohod u různých zaměstnavatelů ani daň z příjmu. · <a href="soukromi.html">Soukromí a cookies</a>
+  </footer>
+
+</div>
+
+<script src="assets/js/sazby.js"></script>
+<script>
+  const S = SAZBY;
+  const $ = id => document.getElementById(id);
+  const num = el => { const v = parseFloat(el.value); return isFinite(v) && v > 0 ? v : 0; };
+  const nahoru = x => Math.ceil(Math.round(x * 100) / 100);
+
+  const POPISY = {
+    DPP: 'Dohoda o provedení práce — max. 300 hodin ročně u jednoho zaměstnavatele.',
+    DPC: 'Dohoda o pracovní činnosti — v průměru max. poloviční úvazek.',
+  };
+  let typ = 'DPP';
+
+  function prepniTyp(novy){
+    typ = novy;
+    $('typDPP').setAttribute('aria-selected', String(typ === 'DPP'));
+    $('typDPC').setAttribute('aria-selected', String(typ === 'DPC'));
+    $('typPopis').textContent = POPISY[typ];
+    spocitej();
+  }
+  $('typDPP').addEventListener('click', () => prepniTyp('DPP'));
+  $('typDPC').addEventListener('click', () => prepniTyp('DPC'));
+
+  function spocitej(){
+    const castka = num($('castka'));
+    const od = S.dohody[typ].odKdyPojistne;   // od této částky se pojistné platí
+    const limit = od - 1;                     // nejvyšší částka bez pojistného
+    const platiSe = castka >= od;
+    const status = platiSe ? 'danger' : (castka >= 0.8 * od ? 'warn' : 'ok');
+
+    // verdikt + razítko
+    $('verdikt').textContent = castka ? (platiSe ? 'Pojistné se platí' : 'Pojistné se neplatí') : '—';
+    const stamp = $('stamp');
+    stamp.className = 'status-stamp status-' + (castka ? status : 'track');
+    stamp.textContent = castka
+      ? (status === 'danger' ? 'PŘEKROČENO' : status === 'warn' ? 'BLÍŽÍ SE LIMITU' : 'V POŘÁDKU')
+      : 'ZADEJ ČÁSTKU';
+
+    // měrka s ryskou na limitu (stejná stupnice jako v Dohodáři: 1,3× limit)
+    const scale = limit * 1.3;
+    $('gaugeFill').className = 'gauge-fill status-' + status;
+    $('gaugeFill').style.width = Math.min(100, (castka / scale) * 100) + '%';
+    $('gaugeMark').style.left = (limit / scale) * 100 + '%';
+    $('gCastka').textContent = formatKc(castka);
+    $('gLimit').textContent = '/ ' + formatKc(limit) + ' (' + (typ === 'DPC' ? 'DPČ' : 'DPP') + ')';
+
+    // zbývá / nad limitem
+    if (platiSe){
+      $('rZbyvaLbl').textContent = 'Nad limitem o';
+      $('rZbyva').textContent = formatKc(castka - limit);
+    } else {
+      $('rZbyvaLbl').textContent = castka === limit ? 'Přesně na limitu — koruna navíc a platíš' : 'Do limitu zbývá';
+      $('rZbyva').textContent = formatKc(limit - castka);
+    }
+
+    // odvody při překročení
+    $('odvodyBox').hidden = !platiSe;
+    $('prekroceniNote').hidden = !platiSe;
+    if (platiSe){
+      const zdravotni = nahoru(castka * S.zamestnanec.zdravotni);
+      const socialni = nahoru(castka * S.zamestnanec.socialni);
+      $('rZdravotni').textContent = '−' + formatKc(zdravotni);
+      $('rSocialni').textContent = '−' + formatKc(socialni);
+      $('rZbyde').textContent = formatKc(castka - zdravotni - socialni);
+      $('rZamestnavatel').textContent = formatKc(castka + nahoru(castka * S.zamestnavatel.zdravotni) + nahoru(castka * S.zamestnavatel.socialni));
+    }
+  }
+
+  $('formDohoda').addEventListener('input', spocitej);
+  $('formDohoda').addEventListener('submit', e => e.preventDefault());
+
+  // tabulka limitů + čísla v textech
+  const dpp = S.dohody.DPP.odKdyPojistne, dpc = S.dohody.DPC.odKdyPojistne;
+  $('limityBody').innerHTML =
+    `<tr><td>DPP</td><td class="num">do ${formatKc(dpp - 1)} / měsíc</td><td class="num">od ${formatKc(dpp)}</td></tr>` +
+    `<tr><td>DPČ</td><td class="num">do ${formatKc(dpc - 1)} / měsíc</td><td class="num">od ${formatKc(dpc)}</td></tr>`;
+  const vyplne = {
+    dppLimit: 'do ' + formatKc(dpp - 1),
+    dpcOd: formatKc(dpc),
+    dppPriklad: formatKc(10000),
+  };
+  document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = vyplne[el.dataset.fill] || '?'; });
+
+  spocitej();
+</script>
+</body>
+</html>

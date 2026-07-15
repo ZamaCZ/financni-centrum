@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dohodář — sleduj brigády a limity DPP/DPČ</title>
+<meta name="description" content="Sleduj příjmy z brigád a gig platforem na jednom místě a hlídej limity DPP a DPČ, ať tě nepřekvapí odvody.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F5EE; --stripe:#E6ECDF; --surface:#FCFDFA; --border:#C9D2C0;
+    --ink:#1E2B21; --ink-muted:#5B6B5A;
+    --ok:#3E7D4C; --ok-bg:#E3EFE1;
+    --warn:#B9791F; --warn-bg:#F5E9D4;
+    --danger:#B23A2E; --danger-bg:#F5DEDB;
+    --pro-navy:#26324A; --seal-gold:#D4A73D;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--ink);
+    background:repeating-linear-gradient(to bottom, var(--paper) 0px, var(--paper) 44px, var(--stripe) 44px, var(--stripe) 88px);
+    line-height:1.5;
+  }
+  .app{max-width:880px;margin:0 auto;padding:32px 20px 64px;}
+
+  .masthead{margin-bottom:28px;}
+  .masthead-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .masthead h1{font-family:var(--font-display);font-size:2.4rem;font-weight:700;margin:0;letter-spacing:-0.01em;}
+  .masthead h1::after{content:'';display:block;width:64px;height:4px;background:var(--ok);margin-top:8px;border-radius:2px;}
+  .subtitle{color:var(--ink-muted);font-size:1.02rem;margin:14px 0 0;max-width:52ch;}
+  .reset-btn{background:none;border:1px solid var(--border);color:var(--ink-muted);font-family:var(--font-body);font-size:0.85rem;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;}
+  .reset-btn:hover{border-color:var(--ink-muted);color:var(--ink);}
+
+  .add-form-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:24px;}
+  .add-form{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:stretch;}
+  .add-form input,.add-form select{font-family:var(--font-body);font-size:0.95rem;padding:10px 12px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--ink);width:100%;}
+  .add-form button{font-family:var(--font-display);font-weight:700;font-size:0.9rem;background:var(--ink);color:var(--surface);border:none;border-radius:6px;padding:10px 18px;cursor:pointer;white-space:nowrap;}
+  .add-form button:hover{background:var(--ok);}
+  @media (max-width:720px){
+    .add-form{grid-template-columns:1fr 1fr;}
+    .add-form input[name="source"]{grid-column:1 / -1;}
+    .add-form button{grid-column:1 / -1;}
+  }
+
+  .overview{margin-bottom:22px;}
+  .overview .label{font-size:0.8rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;}
+  .overview-total{margin:4px 0 2px;}
+  .overview .value{font-family:var(--font-mono);font-size:2.1rem;font-weight:600;}
+  .overview .sublabel{color:var(--ink-muted);font-size:0.9rem;}
+
+  .gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-bottom:32px;}
+  .source-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;}
+  .source-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;}
+  .source-name{font-weight:600;font-size:0.95rem;overflow-wrap:anywhere;}
+  .source-type{font-family:var(--font-mono);font-size:0.72rem;color:var(--ink-muted);border:1px solid var(--border);border-radius:4px;padding:2px 6px;white-space:nowrap;}
+  .gauge{position:relative;height:14px;background:var(--stripe);border-radius:7px;overflow:hidden;margin-bottom:8px;}
+  .gauge-fill{height:100%;border-radius:7px 0 0 7px;transition:width 0.4s ease;}
+  .gauge-fill.status-ok{background:var(--ok);}
+  .gauge-fill.status-warn{background:var(--warn);}
+  .gauge-fill.status-danger{background:var(--danger);}
+  .gauge-limit-mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);}
+  .gauge-numbers{display:flex;align-items:baseline;gap:4px;font-family:var(--font-mono);font-size:0.9rem;margin-bottom:10px;}
+  .gauge-limit-label{color:var(--ink-muted);font-size:0.8rem;}
+  .track-total{font-family:var(--font-mono);font-size:1.5rem;font-weight:600;margin:6px 0 12px;}
+  .status-stamp{display:inline-block;font-family:var(--font-mono);font-size:0.7rem;font-weight:600;letter-spacing:0.04em;padding:4px 8px;border-radius:4px;transform:rotate(-1.5deg);}
+  .status-stamp.status-ok{background:var(--ok-bg);color:var(--ok);}
+  .status-stamp.status-warn{background:var(--warn-bg);color:var(--warn);}
+  .status-stamp.status-danger{background:var(--danger-bg);color:var(--danger);}
+  .status-stamp.status-track{background:var(--stripe);color:var(--ink-muted);}
+
+  .ledger{margin-bottom:32px;}
+  .ledger h2{font-family:var(--font-display);font-size:1.1rem;margin:0 0 12px;}
+  .ledger-list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .ledger-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:0.9rem;}
+  .ledger-item:last-child{border-bottom:none;}
+  .ledger-date{font-family:var(--font-mono);color:var(--ink-muted);white-space:nowrap;min-width:42px;}
+  .ledger-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ledger-type{color:var(--ink-muted);font-size:0.82rem;}
+  .ledger-leader{flex:1;border-bottom:1px dotted var(--border);margin-bottom:4px;min-width:20px;}
+  .ledger-amount{font-family:var(--font-mono);font-weight:600;white-space:nowrap;}
+  .ledger-delete{background:none;border:none;color:var(--ink-muted);font-size:1.1rem;cursor:pointer;line-height:1;padding:2px 4px;}
+  .ledger-delete:hover{color:var(--danger);}
+  .empty-state{padding:20px;color:var(--ink-muted);font-size:0.92rem;text-align:center;}
+
+  .pro-teaser{margin-bottom:24px;}
+  .pro-card{background:var(--pro-navy);color:#EAEEF5;border-radius:10px;padding:22px;position:relative;overflow:hidden;}
+  .pro-seal{position:absolute;top:16px;right:18px;font-family:var(--font-mono);font-size:0.72rem;font-weight:600;color:var(--pro-navy);background:var(--seal-gold);padding:4px 10px;border-radius:20px;transform:rotate(4deg);}
+  .pro-card h3{font-family:var(--font-display);margin:0 0 12px;font-size:1.2rem;}
+  .pro-card ul{margin:0 0 16px;padding-left:18px;font-size:0.9rem;color:#C7D0E0;}
+  .pro-card li{margin-bottom:4px;}
+  .pro-card button{font-family:var(--font-body);font-weight:600;font-size:0.88rem;background:var(--seal-gold);color:var(--pro-navy);border:none;border-radius:6px;padding:9px 16px;cursor:pointer;}
+  .pro-card button:hover{opacity:0.9;}
+  .pro-note{font-size:0.78rem;color:#97A3BB;margin:12px 0 0;}
+  .pro-preview-panel{margin-top:14px;padding-top:14px;border-top:1px solid #3D4A66;}
+  .pro-preview-hint{font-size:0.82rem;color:#97A3BB;margin:0 0 8px;}
+  .pro-mock-row{display:flex;justify-content:space-between;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed #3D4A66;}
+  .pro-mock-tag{font-family:var(--font-mono);color:var(--seal-gold);}
+
+  .disclaimer{font-size:0.78rem;color:var(--ink-muted);border-top:1px solid var(--border);padding-top:16px;max-width:68ch;}
+
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ok);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){.gauge-fill{transition:none;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <h1>Dohodář</h1>
+      <button class="reset-btn" id="resetBtn">Vymazat a začít znovu</button>
+    </div>
+    <p class="subtitle">Sleduj brigády a gig platformy na jednom místě a hlídej limity DPP a DPČ, ať tě nepřekvapí odvody.</p>
+  </header>
+
+  <section class="add-form-section">
+    <form id="addForm" class="add-form">
+      <input name="source" placeholder="Zdroj (Firma s.r.o., Prolific…)" required>
+      <select name="type">
+        <option value="DPP">DPP</option>
+        <option value="DPČ">DPČ</option>
+        <option value="Jiné">Jiné</option>
+      </select>
+      <input name="amount" type="number" min="1" step="1" placeholder="Částka (Kč)" required>
+      <input name="date" type="date" required>
+      <button type="submit">+ Přidat</button>
+    </form>
+  </section>
+
+  <section class="overview">
+    <span class="label">Tento měsíc celkem</span>
+    <div class="overview-total"><span class="value" id="totalThisMonth">0 Kč</span></div>
+    <span class="sublabel" id="monthLine"></span>
+  </section>
+
+  <section class="gauges" id="gaugesContainer"></section>
+
+  <section class="ledger">
+    <h2>Záznamy</h2>
+    <ul id="ledgerList" class="ledger-list"></ul>
+  </section>
+
+  <section class="pro-teaser">
+    <div class="pro-card">
+      <span class="pro-seal">PRO</span>
+      <h3>Dohodář PRO</h3>
+      <ul>
+        <li>Export do Excelu a PDF</li>
+        <li>Historie napříč všemi měsíci a roky</li>
+        <li>E-mailové upozornění před překročením limitu</li>
+        <li>Neomezený počet zdrojů</li>
+      </ul>
+      <button id="proPreviewBtn">Zobrazit PRO náhled</button>
+      <p class="pro-note">Tohle je zatím jen ukázka rozhraní — až nasadíš vlastní verzi, sem napojíš Stripe Checkout (viz komentář ve zdrojovém kódu).</p>
+      <div class="pro-preview-panel" id="proPreviewPanel" hidden>
+        <p class="pro-preview-hint">Takhle by to vypadalo s PRO — ukázka, ne živá data:</p>
+        <div class="pro-mock-row"><span>Export do Excelu</span><span class="pro-mock-tag">.xlsx ⬇</span></div>
+        <div class="pro-mock-row"><span>Historie: květen–červenec 2026</span><span class="pro-mock-tag">3 měsíce</span></div>
+        <div class="pro-mock-row"><span>Upozornění před limitem</span><span class="pro-mock-tag">e-mail ✓</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="disclaimer">
+    Limity pro rok 2026: DPP 11 999 Kč a DPČ 4 500 Kč hrubého měsíčně u jednoho zaměstnavatele — nad tuto částku se už platí sociální a zdravotní pojištění. Pravidla se každý rok mění, tohle není daňové ani právní poradenství, aktuální limity si pro jistotu ověř.
+  </footer>
+
+</div>
+
+<script>
+  /*
+    Napojení plateb (až budeš nasazovat naostro):
+    1. Zaregistruj se do Stripe přes GitHub Student Developer Pack — odpustí ti
+       transakční poplatky z prvního tisíce dolarů tržby.
+    2. Tlačítko "Zobrazit PRO náhled" nahraď odkazem, který vytvoří Stripe
+       Checkout Session (potřebuješ malý backend nebo Stripe Payment Link).
+    3. Po úspěšné platbě Stripe přesměruje zpátky s parametrem v URL — podle
+       něj natrvalo odemkneš PRO (uložit třeba do Appwrite z pack, ať to
+       vydrží i po zavření prohlížeče).
+  */
+
+  let entries = [
+    { id:1, source:'Zákaznická podpora s.r.o.', type:'DPP', amount:2100, date:'2026-07-01' },
+    { id:2, source:'Zákaznická podpora s.r.o.', type:'DPP', amount:2100, date:'2026-07-08' },
+    { id:3, source:'Zákaznická podpora s.r.o.', type:'DPP', amount:4200, date:'2026-07-15' },
+    { id:4, source:'Market Minds', type:'DPČ', amount:4800, date:'2026-07-10' },
+    { id:5, source:'Firma Bene s.r.o.', type:'DPP', amount:10200, date:'2026-07-05' },
+    { id:6, source:'Prolific', type:'Jiné', amount:245, date:'2026-07-12' },
+    { id:7, source:'Prolific', type:'Jiné', amount:180, date:'2026-07-14' },
+    { id:8, source:'Prolific', type:'Jiné', amount:195, date:'2026-07-09' }
+  ];
+  let nextId = 9;
+
+  const LIMITS = { 'DPP': 11999, 'DPČ': 4500 };
+  const MONTH_NAMES = ['leden','únor','březen','duben','květen','červen','červenec','srpen','září','říjen','listopad','prosinec'];
+
+  function getMonthKey(dateStr){ return dateStr.slice(0,7); }
+  function currentMonthKey(){ return new Date().toISOString().slice(0,10).slice(0,7); }
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+  function getActiveMonthKey(){
+    if (entries.length === 0) return currentMonthKey();
+    return entries.map(e => getMonthKey(e.date)).sort().reverse()[0];
+  }
+
+  function formatMonthLabel(monthKey){
+    const [y,m] = monthKey.split('-').map(Number);
+    return `${MONTH_NAMES[m-1]} ${y}`;
+  }
+
+  function formatKc(amount){
+    return new Intl.NumberFormat('cs-CZ').format(amount) + ' Kč';
+  }
+
+  function formatShortDate(dateStr){
+    const [y,m,d] = dateStr.split('-').map(Number);
+    return `${d}. ${m}.`;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function groupBySourceForMonth(monthKey){
+    const groups = {};
+    entries.filter(e => getMonthKey(e.date) === monthKey).forEach(e => {
+      if (!groups[e.source]) groups[e.source] = { source:e.source, type:e.type, total:0 };
+      groups[e.source].total += e.amount;
+    });
+    return Object.values(groups);
+  }
+
+  function getStatus(type, total){
+    const limit = LIMITS[type];
+    if (!limit) return { status:'track', percent:null };
+    const percent = total / limit;
+    if (percent >= 1) return { status:'danger', percent };
+    if (percent >= 0.8) return { status:'warn', percent };
+    return { status:'ok', percent };
+  }
+
+  function render(){
+    renderOverview();
+    renderGauges();
+    renderLedger();
+  }
+
+  function renderOverview(){
+    const monthKey = getActiveMonthKey();
+    const monthEntries = entries.filter(e => getMonthKey(e.date) === monthKey);
+    const total = monthEntries.reduce((s,e) => s + e.amount, 0);
+    const sources = new Set(monthEntries.map(e => e.source));
+    document.getElementById('totalThisMonth').textContent = formatKc(total);
+    document.getElementById('monthLine').textContent = monthEntries.length
+      ? `${formatMonthLabel(monthKey)} · zdrojů: ${sources.size}`
+      : `${formatMonthLabel(monthKey)} · zatím žádné záznamy`;
+  }
+
+  function renderGauges(){
+    const monthKey = getActiveMonthKey();
+    const groups = groupBySourceForMonth(monthKey);
+    const container = document.getElementById('gaugesContainer');
+
+    if (groups.length === 0){
+      container.innerHTML = '<p class="empty-state">Zatím žádné záznamy pro tenhle měsíc. Přidej první brigádu nebo platbu výše.</p>';
+      return;
+    }
+
+    container.innerHTML = groups.map(g => {
+      const limit = LIMITS[g.type];
+      if (limit){
+        const scale = limit * 1.3;
+        const fillPercent = Math.min(100, (g.total / scale) * 100);
+        const markPercent = (limit / scale) * 100;
+        const { status } = getStatus(g.type, g.total);
+        const statusLabel = status === 'danger' ? 'PŘEKROČENO' : status === 'warn' ? 'BLÍŽÍ SE LIMITU' : 'V POŘÁDKU';
+        return `
+          <div class="source-card">
+            <div class="source-card-head">
+              <span class="source-name">${escapeHtml(g.source)}</span>
+              <span class="source-type">${g.type}</span>
+            </div>
+            <div class="gauge">
+              <div class="gauge-fill status-${status}" style="width:${fillPercent}%"></div>
+              <div class="gauge-limit-mark" style="left:${markPercent}%"></div>
+            </div>
+            <div class="gauge-numbers">
+              <span class="gauge-current">${formatKc(g.total)}</span>
+              <span class="gauge-limit-label">/ ${formatKc(limit)}</span>
+            </div>
+            <span class="status-stamp status-${status}">${statusLabel}</span>
+          </div>`;
+      }
+      return `
+        <div class="source-card">
+          <div class="source-card-head">
+            <span class="source-name">${escapeHtml(g.source)}</span>
+            <span class="source-type">${escapeHtml(g.type)}</span>
+          </div>
+          <div class="track-total">${formatKc(g.total)}</div>
+          <span class="status-stamp status-track">SLEDOVÁNO</span>
+        </div>`;
+    }).join('');
+  }
+
+  function renderLedger(){
+    const list = document.getElementById('ledgerList');
+    if (entries.length === 0){
+      list.innerHTML = '<li class="empty-state">Zatím žádné záznamy. Přidej první brigádu nebo platbu výše.</li>';
+      return;
+    }
+    const sorted = [...entries].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+    list.innerHTML = sorted.map(e => `
+      <li class="ledger-item">
+        <span class="ledger-date">${formatShortDate(e.date)}</span>
+        <span class="ledger-name">${escapeHtml(e.source)} <span class="ledger-type">(${escapeHtml(e.type)})</span></span>
+        <span class="ledger-leader"></span>
+        <span class="ledger-amount">${formatKc(e.amount)}</span>
+        <button class="ledger-delete" data-id="${e.id}" aria-label="Smazat záznam" title="Smazat záznam">×</button>
+      </li>`).join('');
+
+    list.querySelectorAll('.ledger-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        entries = entries.filter(e => e.id !== Number(btn.dataset.id));
+        render();
+      });
+    });
+  }
+
+  document.getElementById('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const source = form.source.value.trim();
+    const type = form.type.value;
+    const amount = Number(form.amount.value);
+    const date = form.date.value;
+    if (!source || !amount || amount <= 0 || !date) return;
+    entries.push({ id: nextId++, source, type, amount, date });
+    form.reset();
+    form.date.value = todayStr();
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Opravdu smazat všechny záznamy a začít znovu?')){
+      entries = [];
+      render();
+    }
+  });
+
+  let proPreviewActive = false;
+  document.getElementById('proPreviewBtn').addEventListener('click', () => {
+    proPreviewActive = !proPreviewActive;
+    document.getElementById('proPreviewPanel').hidden = !proPreviewActive;
+    document.getElementById('proPreviewBtn').textContent = proPreviewActive ? 'Skrýt PRO náhled' : 'Zobrazit PRO náhled';
+  });
+
+  document.querySelector('input[name="date"]').value = todayStr();
+  render();
+</script>
+</body>
+</html>

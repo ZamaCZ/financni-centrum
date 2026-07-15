@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulačka čisté mzdy 2026 a odvodů OSVČ — Finanční centrum</title>
+<meta name="description" content="Spočítej si čistou mzdu z hrubé pro rok 2026: daň 15/23 %, sociální a zdravotní pojištění, slevy na dani i daňový bonus na děti. Včetně odvodů a daně pro OSVČ s paušálními výdaji.">
+<meta property="og:title" content="Kalkulačka čisté mzdy 2026 a odvodů OSVČ">
+<meta property="og:description" content="Hrubá → čistá mzda podle sazeb 2026, včetně slev na dani a odvodů OSVČ.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/base.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Jak se v roce 2026 počítá čistá mzda z hrubé?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Z hrubé mzdy se odečte zdravotní pojištění 4,5 % a sociální pojištění 7,1 %. Záloha na daň je 15 % ze základu zaokrouhleného na stovky nahoru (23 % z části nad trojnásobek průměrné mzdy), snížená o slevy na dani — základní sleva na poplatníka je 2 570 Kč měsíčně." }
+    },
+    {
+      "@type": "Question",
+      "name": "Od jaké mzdy se v roce 2026 platí 23% daň?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sazba 23 % se v roce 2026 platí z části základu daně nad 146 901 Kč měsíčně (36násobek průměrné mzdy ročně, tj. 1 762 812 Kč). Do této hranice platí sazba 15 %." }
+    },
+    {
+      "@type": "Question",
+      "name": "Co je daňový bonus na děti?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Pokud je daňové zvýhodnění na děti vyšší než vypočtená daň, rozdíl vám stát vyplatí jako daňový bonus. Podmínkou je měsíční příjem alespoň ve výši poloviny minimální mzdy." }
+    },
+    {
+      "@type": "Question",
+      "name": "Jaké jsou minimální zálohy OSVČ v roce 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Minimální záloha na zdravotní pojištění je 3 306 Kč měsíčně. U sociálního pojištění novela zpětně snížila minimální vyměřovací základ ze 40 % na 35 % průměrné mzdy: od července 2026 je minimální záloha 5 005 Kč (do června se platilo 5 720 Kč a rozdíl se vrací jako přeplatek)." }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<div class="app">
+
+  <nav class="site-nav">
+    <a class="brand" href="index.html">
+      <span class="brand-name">Finanční centrum</span>
+      <span class="brand-seal">2026</span>
+    </a>
+    <div class="site-nav-links">
+      <a href="index.html">Kalkulačky</a>
+      <a href="cista-mzda.html" class="active">Čistá mzda</a>
+      <a href="dpp-dpc.html">DPP/DPČ</a>
+    </div>
+  </nav>
+
+  <header class="masthead">
+    <h1>Kalkulačka čisté mzdy 2026</h1>
+    <p class="subtitle">Spočítej si, kolik ti z hrubé mzdy reálně přijde na účet — podle sazeb pro rok 2026, včetně slev na dani a daňového bonusu. Podnikáš? Přepni na OSVČ a spočítej si odvody a daň z podnikání.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Typ výpočtu">
+    <button id="tabZam" role="tab" aria-selected="true" aria-controls="panelZam">Zaměstnanec</button>
+    <button id="tabOsvc" role="tab" aria-selected="false" aria-controls="panelOsvc">OSVČ</button>
+  </div>
+
+  <!-- ================= ZAMĚSTNANEC ================= -->
+  <section id="panelZam" role="tabpanel" aria-labelledby="tabZam">
+    <div class="calc-layout">
+      <form class="panel" id="formZam">
+        <div class="field">
+          <label for="zamHruba">Hrubá měsíční mzda</label>
+          <input type="number" id="zamHruba" min="0" step="500" value="45000" inputmode="numeric">
+        </div>
+        <label class="check">
+          <input type="checkbox" id="zamPoplatnik" checked>
+          <span>Sleva na poplatníka (2 570 Kč/měs)
+            <span class="hint">Uplatníš, pokud máš u zaměstnavatele podepsané prohlášení k dani („růžovku“).</span>
+          </span>
+        </label>
+        <div class="field">
+          <label for="zamInvalidita">Invalidní důchod</label>
+          <select id="zamInvalidita">
+            <option value="ne" selected>Nepobírám</option>
+            <option value="12">1. nebo 2. stupně (sleva 210 Kč/měs)</option>
+            <option value="3">3. stupně (sleva 420 Kč/měs)</option>
+          </select>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="zamZtpp">
+          <span>Jsem držitel průkazu ZTP/P (sleva 1 345 Kč/měs)</span>
+        </label>
+        <div class="field-row">
+          <div class="field">
+            <label for="zamDeti">Počet dětí</label>
+            <input type="number" id="zamDeti" min="0" max="10" step="1" value="0" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="zamDetiZtpp">Z toho se ZTP/P</label>
+            <input type="number" id="zamDetiZtpp" min="0" max="10" step="1" value="0" inputmode="numeric">
+          </div>
+        </div>
+        <p class="hint" style="margin:0;">Daňové zvýhodnění: 1. dítě 1 267 Kč, 2. dítě 1 860 Kč, 3. a další 2 320 Kč měsíčně. Dítě se ZTP/P dvojnásobek. Uplatňuje vždy jen jeden z rodičů.</p>
+      </form>
+
+      <div class="panel">
+        <span class="result-label">Čistá mzda</span>
+        <div class="result-value" id="zamCista">—</div>
+        <span class="status-stamp status-navy" id="zamStamp">ODVODY CELKEM — %</span>
+
+        <div class="split-bar" aria-hidden="true">
+          <span class="seg-net" id="barNet"></span>
+          <span class="seg-dan" id="barDan"></span>
+          <span class="seg-soc" id="barSoc"></span>
+          <span class="seg-zdr" id="barZdr"></span>
+        </div>
+        <div class="legend">
+          <span><i class="seg-net"></i>čistá mzda <span class="num" id="legNet">—</span></span>
+          <span><i class="seg-dan"></i>daň <span class="num" id="legDan">—</span></span>
+          <span><i class="seg-soc"></i>sociální <span class="num" id="legSoc">—</span></span>
+          <span><i class="seg-zdr"></i>zdravotní <span class="num" id="legZdr">—</span></span>
+        </div>
+
+        <div class="rrow"><span class="lbl">Hrubá mzda</span><span class="leader"></span><span class="amt" id="rHruba">—</span></div>
+        <div class="rrow"><span class="lbl">Zdravotní pojištění (4,5 %)</span><span class="leader"></span><span class="amt minus" id="rZdravotni">—</span></div>
+        <div class="rrow"><span class="lbl">Sociální pojištění (7,1 %)</span><span class="leader"></span><span class="amt minus" id="rSocialni">—</span></div>
+        <div class="rrow"><span class="lbl">Záloha na daň <span class="poznamka" id="rDanPoznamka"></span></span><span class="leader"></span><span class="amt minus" id="rDan">—</span></div>
+        <div class="rrow" id="rBonusRow" hidden><span class="lbl">Daňový bonus na děti</span><span class="leader"></span><span class="amt plus" id="rBonus">—</span></div>
+        <div class="rrow total"><span class="lbl">Čistá mzda</span><span class="leader"></span><span class="amt" id="rCista">—</span></div>
+
+        <div class="rrow" style="margin-top:10px;"><span class="lbl">Celkové náklady zaměstnavatele <span class="poznamka">(hrubá + 33,8 %)</span></span><span class="leader"></span><span class="amt" id="rZamestnavatel">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= OSVČ ================= -->
+  <section id="panelOsvc" role="tabpanel" aria-labelledby="tabOsvc" hidden>
+    <div class="calc-layout">
+      <form class="panel" id="formOsvc">
+        <div class="field">
+          <label for="osvcPrijmy">Roční příjmy (fakturace)</label>
+          <input type="number" id="osvcPrijmy" min="0" step="10000" value="960000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="osvcVydajeRezim">Výdaje</label>
+          <select id="osvcVydajeRezim">
+            <option value="p60" selected>Paušál 60 % — ostatní živnosti</option>
+            <option value="p80">Paušál 80 % — řemesla a zemědělství</option>
+            <option value="p40">Paušál 40 % — svobodná povolání, autoři</option>
+            <option value="p30">Paušál 30 % — nájem majetku</option>
+            <option value="skutecne">Skutečné výdaje</option>
+          </select>
+        </div>
+        <div class="field" id="osvcVydajeSkutecneField" hidden>
+          <label for="osvcVydajeSkutecne">Skutečné roční výdaje</label>
+          <input type="number" id="osvcVydajeSkutecne" min="0" step="10000" value="0" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="osvcCinnost">Typ činnosti</label>
+          <select id="osvcCinnost">
+            <option value="hlavni" selected>Hlavní činnost</option>
+            <option value="vedlejsi">Vedlejší činnost (při zaměstnání, studiu…)</option>
+          </select>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="osvcPoplatnik" checked>
+          <span>Sleva na poplatníka (30 840 Kč/rok)</span>
+        </label>
+        <div class="field">
+          <label for="osvcDeti">Počet dětí</label>
+          <input type="number" id="osvcDeti" min="0" max="10" step="1" value="0" inputmode="numeric">
+        </div>
+      </form>
+
+      <div class="panel">
+        <span class="result-label">Zbyde ti ročně</span>
+        <div class="result-value" id="osvcZbyde">—</div>
+        <div class="result-sub" id="osvcZbydeMesic">—</div>
+        <span class="status-stamp status-navy" id="osvcStamp">DAŇ A ODVODY — % ZE ZISKU</span>
+
+        <div class="rrow" style="margin-top:14px;"><span class="lbl">Roční příjmy</span><span class="leader"></span><span class="amt" id="oPrijmy">—</span></div>
+        <div class="rrow"><span class="lbl">Výdaje <span class="poznamka" id="oVydajePoznamka"></span></span><span class="leader"></span><span class="amt" id="oVydaje">—</span></div>
+        <div class="rrow"><span class="lbl">Zisk (základ daně)</span><span class="leader"></span><span class="amt" id="oZisk">—</span></div>
+        <div class="rrow"><span class="lbl">Daň z příjmu po slevách</span><span class="leader"></span><span class="amt minus" id="oDan">—</span></div>
+        <div class="rrow" id="oBonusRow" hidden><span class="lbl">Daňový bonus na děti</span><span class="leader"></span><span class="amt plus" id="oBonus">—</span></div>
+        <div class="rrow"><span class="lbl">Sociální pojištění <span class="poznamka" id="oSocPoznamka"></span></span><span class="leader"></span><span class="amt minus" id="oSocialni">—</span></div>
+        <div class="rrow"><span class="lbl">Zdravotní pojištění <span class="poznamka" id="oZdrPoznamka"></span></span><span class="leader"></span><span class="amt minus" id="oZdravotni">—</span></div>
+        <div class="rrow total"><span class="lbl" id="oZbydeLbl">Zbyde ti ročně</span><span class="leader"></span><span class="amt" id="oZbyde">—</span></div>
+
+        <div class="rrow" style="margin-top:10px;"><span class="lbl">Orientační měsíční zálohy <span class="poznamka">(sociální + zdravotní)</span></span><span class="leader"></span><span class="amt" id="oZalohy">—</span></div>
+
+        <div class="note note-info" id="oPausalNote">U paušálních výdajů jsou výdaje jen daňová fikce — reálné náklady podnikání si od výsledku odečti sám. Zvaž taky <strong>paušální daň</strong>: jedna platba měsíčně místo daně a obou pojistných (pro příjmy do 2 mil. Kč).</div>
+        <div class="note" id="oMinNote" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SAZBY ================= -->
+  <h2 class="section-title" id="sazby">Sazby a limity pro rok 2026</h2>
+  <div class="table-wrap">
+    <table class="rates-table">
+      <thead><tr><th>Parametr</th><th>Hodnota 2026</th></tr></thead>
+      <tbody id="ratesBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ================= FAQ ================= -->
+  <h2 class="section-title">Časté otázky</h2>
+  <details>
+    <summary>Jak se z hrubé mzdy počítá čistá?</summary>
+    <p>Z hrubé mzdy zaplatíš zdravotní pojištění 4,5 % a sociální pojištění 7,1 %. Vedle toho se počítá záloha na daň: 15 % ze základu (hrubé mzdy zaokrouhlené na stovky nahoru), z části nad <span data-fill="hranice23Mesic"></span> měsíčně pak 23 %. Od zálohy se odečtou slevy na dani — základní sleva na poplatníka je 2 570 Kč měsíčně. Co zbyde po odečtení pojistného a daně, je čistá mzda.</p>
+  </details>
+  <details>
+    <summary>Kdy platím 23% daň?</summary>
+    <p>Vyšší sazba se týká jen části základu daně nad trojnásobek průměrné mzdy — v roce 2026 nad <span data-fill="hranice23Mesic"></span> měsíčně (ročně <span data-fill="hranice23Rok"></span>). Všechno pod hranicí se daní 15 %, takže překročení hranice ti nezdraží celou výplatu, jen tu část navíc.</p>
+  </details>
+  <details>
+    <summary>Co je daňový bonus na děti?</summary>
+    <p>Když je daňové zvýhodnění na děti vyšší než vypočtená daň, stát ti rozdíl doplatí — to je daňový bonus. Podmínkou u zaměstnance je příjem alespoň ve výši poloviny minimální mzdy (<span data-fill="pulMinimalky"></span> měsíčně v roce 2026), u OSVČ roční příjem alespoň šestinásobek minimální mzdy.</p>
+  </details>
+  <details>
+    <summary>Jaké jsou minimální zálohy OSVČ v roce 2026?</summary>
+    <p>Zdravotní pojištění minimálně <span data-fill="osvcMinZalohaZdr"></span> měsíčně. U sociálního pojištění došlo v roce 2026 ke zpětné změně: novela snížila minimální vyměřovací základ ze 40 % na 35 % průměrné mzdy, takže minimální záloha od července 2026 činí <span data-fill="osvcMinZalohaSoc"></span> (do června se platilo 5 720 Kč a rozdíl ČSSZ vrací jako přeplatek). U vedlejší činnosti se do ročního zisku <span data-fill="osvcRozhodnaCastka"></span> sociální pojištění neplatí vůbec.</p>
+  </details>
+
+  <footer class="disclaimer">
+    Kalkulačka je orientační a nenahrazuje daňové ani právní poradenství. Počítá se sazbami pro rok 2026 (průměrná mzda 48 967 Kč dle nařízení vlády č. 365/2025 Sb., minimální mzda 22 400 Kč). Nezohledňuje maximální vyměřovací základ sociálního pojištění (<span data-fill="maxVzSocRok"></span>/rok), souběh více zaměstnavatelů, krácení rozhodné částky u vedlejší činnosti podle měsíců podnikání ani nemocenské pojištění OSVČ. Sazby se každý rok mění — před dalším rokem je ověř. · <a href="soukromi.html">Soukromí a cookies</a>
+  </footer>
+
+</div>
+
+<script src="assets/js/sazby.js"></script>
+<script>
+  const S = SAZBY;
+  const $ = id => document.getElementById(id);
+  const num = el => { const v = parseFloat(el.value); return isFinite(v) && v > 0 ? v : 0; };
+  // zaokrouhlení na koruny nahoru — přes haléře, ať šum plovoucí čárky nepřidá korunu navíc
+  const nahoru = x => Math.ceil(Math.round(x * 100) / 100);
+
+  /* ---------- společné výpočty ---------- */
+
+  function danZeZakladu(zaklad, hranice){
+    if (zaklad <= hranice) return zaklad * S.dan.sazbaZakladni;
+    return hranice * S.dan.sazbaZakladni + (zaklad - hranice) * S.dan.sazbaVyssi;
+  }
+
+  // Zvýhodnění na děti; ZTP/P dvojnásobek uplatníme na nejvyšší částky (výhodnější pořadí)
+  function zvyhodneniNaDeti(pocet, pocetZtpp, mesicne){
+    const zakladni = [S.deti.prvni, S.deti.druhe, S.deti.tretiADalsi];
+    const castky = [];
+    for (let i = 0; i < pocet; i++) castky.push(zakladni[Math.min(i, 2)]);
+    castky.sort((a, b) => b - a);
+    let soucet = 0;
+    castky.forEach((c, i) => { soucet += i < pocetZtpp ? c * 2 : c; });
+    return mesicne ? soucet : soucet * 12;
+  }
+
+  /* ---------- zaměstnanec ---------- */
+
+  function spocitejZamestnance(){
+    const hruba = num($('zamHruba'));
+    const zdravotni = nahoru(hruba * S.zamestnanec.zdravotni);
+    const socialni = nahoru(hruba * S.zamestnanec.socialni);
+
+    const zaklad = Math.ceil(hruba / 100) * 100;
+    const zaloha = nahoru(danZeZakladu(zaklad, S.hranice23Mesic));
+
+    let slevy = 0;
+    if ($('zamPoplatnik').checked) slevy += S.slevy.poplatnik;
+    const inv = $('zamInvalidita').value;
+    if (inv === '12') slevy += S.slevy.invalidita12;
+    if (inv === '3') slevy += S.slevy.invalidita3;
+    if ($('zamZtpp').checked) slevy += S.slevy.ztpp;
+
+    const deti = Math.min(10, Math.max(0, Math.round(num($('zamDeti')))));
+    const detiZtpp = Math.min(deti, Math.max(0, Math.round(num($('zamDetiZtpp')))));
+    const zvyhodneni = zvyhodneniNaDeti(deti, detiZtpp, true);
+
+    let dan = Math.max(0, zaloha - slevy) - zvyhodneni;
+    let bonus = 0;
+    if (dan < 0){
+      if (hruba >= S.minimalniMzda / 2) bonus = -dan; // nárok na bonus jen od poloviny minimální mzdy
+      dan = 0;
+    }
+
+    const cista = hruba - zdravotni - socialni - dan + bonus;
+    const zamestnavatel = hruba + nahoru(hruba * S.zamestnavatel.zdravotni) + nahoru(hruba * S.zamestnavatel.socialni);
+
+    $('zamCista').textContent = hruba ? formatKc(cista) : '—';
+    $('rHruba').textContent = formatKc(hruba);
+    $('rZdravotni').textContent = '−' + formatKc(zdravotni);
+    $('rSocialni').textContent = '−' + formatKc(socialni);
+    $('rDan').textContent = '−' + formatKc(dan);
+    $('rDanPoznamka').textContent = zaklad > S.hranice23Mesic ? '(15 % + 23 % nad hranicí, po slevách)' : '(15 % po slevách)';
+    $('rBonusRow').hidden = bonus <= 0;
+    $('rBonus').textContent = '+' + formatKc(bonus);
+    $('rCista').textContent = formatKc(cista);
+    $('rZamestnavatel').textContent = formatKc(zamestnavatel);
+
+    const stamp = $('zamStamp');
+    if (hruba > 0){
+      const odvody = (hruba - cista) / hruba;
+      stamp.textContent = odvody < 0
+        ? 'BONUS PŘEVYŠUJE ODVODY'
+        : 'ODVODY CELKEM ' + formatProc(odvody);
+    } else {
+      stamp.textContent = 'ODVODY CELKEM — %';
+    }
+
+    // skládaný pruh: součet segmentů = hrubá + bonus, ať je vždy 100 %
+    const celkem = zdravotni + socialni + dan + Math.max(0, cista);
+    const seg = (castka) => celkem > 0 ? (100 * castka / celkem) + '%' : '0%';
+    $('barNet').style.width = seg(Math.max(0, cista));
+    $('barDan').style.width = seg(dan);
+    $('barSoc').style.width = seg(socialni);
+    $('barZdr').style.width = seg(zdravotni);
+    const legPct = (castka) => hruba > 0 ? formatProc(castka / hruba) : '—';
+    $('legNet').textContent = legPct(cista);
+    $('legDan').textContent = legPct(dan);
+    $('legSoc').textContent = legPct(socialni);
+    $('legZdr').textContent = legPct(zdravotni);
+  }
+
+  /* ---------- OSVČ ---------- */
+
+  function spocitejOsvc(){
+    const prijmy = num($('osvcPrijmy'));
+    const rezim = $('osvcVydajeRezim').value;
+    const skutecne = rezim === 'skutecne';
+    $('osvcVydajeSkutecneField').hidden = !skutecne;
+    $('oPausalNote').hidden = skutecne;
+
+    let vydaje, vydajePoznamka;
+    if (skutecne){
+      vydaje = Math.min(num($('osvcVydajeSkutecne')), prijmy);
+      vydajePoznamka = '(skutečné)';
+    } else {
+      const p = S.pausaly[rezim];
+      vydaje = Math.min(prijmy * p.sazba, p.strop);
+      vydajePoznamka = `(paušál ${Math.round(p.sazba * 100)} %${vydaje === p.strop ? ', dosažen strop' : ''})`;
+    }
+    const zisk = Math.max(0, prijmy - vydaje);
+    const vedlejsi = $('osvcCinnost').value === 'vedlejsi';
+
+    // daň z příjmů
+    const zakladDane = Math.floor(zisk / 100) * 100;
+    const zaloha = danZeZakladu(zakladDane, S.hranice23Rok);
+    const slevy = ($('osvcPoplatnik').checked ? S.slevy.poplatnik * 12 : 0);
+    const deti = Math.min(10, Math.max(0, Math.round(num($('osvcDeti')))));
+    const zvyhodneni = zvyhodneniNaDeti(deti, 0, false);
+    let dan = Math.max(0, zaloha - slevy) - zvyhodneni;
+    let bonus = 0;
+    if (dan < 0){
+      if (prijmy >= 6 * S.minimalniMzda) bonus = -dan; // roční příjem aspoň 6× minimální mzdy
+      dan = 0;
+    }
+
+    // sociální pojištění
+    let socialni = 0, socPoznamka = '', minPouzito = false;
+    let vzSoc = zisk * S.osvc.socialniZakladZisku;
+    if (vedlejsi && zisk < S.osvcRozhodnaCastka){
+      socPoznamka = '(pod rozhodnou částkou — neplatí se)';
+    } else {
+      const minVz = 12 * (vedlejsi ? S.osvcMinVzSocVedl : S.osvcMinVzSocMesic);
+      if (vzSoc < minVz){ vzSoc = minVz; socPoznamka = '(minimální vyměřovací základ)'; minPouzito = true; }
+      vzSoc = Math.min(vzSoc, S.maxVzSocRok);
+      socialni = nahoru(vzSoc * S.osvc.socialniSazba);
+    }
+
+    // zdravotní pojištění
+    let vzZdr = zisk * S.osvc.zdravotniZakladZisku, zdrPoznamka = '';
+    if (!vedlejsi){
+      const minVz = 12 * S.osvcMinVzZdrMesic;
+      if (vzZdr < minVz){ vzZdr = minVz; zdrPoznamka = '(minimální vyměřovací základ)'; minPouzito = true; }
+    } else {
+      zdrPoznamka = '(ze skutečného zisku, bez minima)';
+    }
+    const zdravotni = nahoru(vzZdr * S.osvc.zdravotniSazba);
+
+    const zbyde = prijmy - (skutecne ? vydaje : 0) - dan - socialni - zdravotni + bonus;
+
+    $('osvcZbyde').textContent = prijmy ? formatKc(zbyde) : '—';
+    $('osvcZbydeMesic').textContent = prijmy ? '≈ ' + formatKc(Math.round(zbyde / 12)) + ' měsíčně' : '—';
+    $('oPrijmy').textContent = formatKc(prijmy);
+    $('oVydaje').textContent = (skutecne ? '−' : '') + formatKc(vydaje);
+    $('oVydajePoznamka').textContent = vydajePoznamka;
+    $('oZisk').textContent = formatKc(zisk);
+    $('oDan').textContent = '−' + formatKc(dan);
+    $('oBonusRow').hidden = bonus <= 0;
+    $('oBonus').textContent = '+' + formatKc(bonus);
+    $('oSocialni').textContent = '−' + formatKc(socialni);
+    $('oSocPoznamka').textContent = socPoznamka;
+    $('oZdravotni').textContent = '−' + formatKc(zdravotni);
+    $('oZdrPoznamka').textContent = zdrPoznamka;
+    $('oZbydeLbl').textContent = skutecne ? 'Zbyde ti ročně' : 'Zbyde ti ročně (před skutečnými náklady)';
+    $('oZbyde').textContent = formatKc(zbyde);
+    $('oZalohy').textContent = socialni || zdravotni
+      ? formatKc(nahoru(socialni / 12)) + ' + ' + formatKc(nahoru(zdravotni / 12))
+      : '—';
+
+    const zatizeni = zisk > 0 ? (dan - bonus + socialni + zdravotni) / zisk : 0;
+    $('osvcStamp').textContent = zisk > 0 ? 'DAŇ A ODVODY ' + formatProc(zatizeni) + ' ZE ZISKU' : 'DAŇ A ODVODY — % ZE ZISKU';
+
+    const minNote = $('oMinNote');
+    minNote.hidden = !minPouzito;
+    minNote.textContent = 'Zisk je pod minimem, takže pojistné počítáme z minimálního vyměřovacího základu — platí se i při nízkém nebo nulovém zisku (u hlavní činnosti).';
+  }
+
+  /* ---------- záložky ---------- */
+
+  function prepniTab(osvc){
+    $('tabZam').setAttribute('aria-selected', String(!osvc));
+    $('tabOsvc').setAttribute('aria-selected', String(osvc));
+    $('panelZam').hidden = osvc;
+    $('panelOsvc').hidden = !osvc;
+    history.replaceState(null, '', osvc ? '#osvc' : location.pathname.split('/').pop() || 'cista-mzda.html');
+  }
+  $('tabZam').addEventListener('click', () => prepniTab(false));
+  $('tabOsvc').addEventListener('click', () => prepniTab(true));
+  if (location.hash === '#osvc') prepniTab(true);
+
+  /* ---------- tabulka sazeb a doplnění čísel v textech ---------- */
+
+  function radek(nazev, hodnota){
+    return `<tr><td>${nazev}</td><td class="num">${hodnota}</td></tr>`;
+  }
+  document.getElementById('ratesBody').innerHTML = [
+    radek('Průměrná mzda', formatKc(S.prumernaMzda) + ' / měsíc'),
+    radek('Minimální mzda', formatKc(S.minimalniMzda) + ' / měsíc'),
+    radek('Hranice 23% daně', formatKc(S.hranice23Mesic) + ' / měsíc (' + formatKc(S.hranice23Rok) + ' / rok)'),
+    radek('Sleva na poplatníka', formatKc(S.slevy.poplatnik) + ' / měsíc (' + formatKc(S.slevy.poplatnik * 12) + ' / rok)'),
+    radek('Daňové zvýhodnění na děti', formatKc(S.deti.prvni) + ' / ' + formatKc(S.deti.druhe) + ' / ' + formatKc(S.deti.tretiADalsi) + ' měsíčně'),
+    radek('Pojistné — zaměstnanec', '4,5 % zdravotní + 7,1 % sociální'),
+    radek('Pojistné — zaměstnavatel', '9 % zdravotní + 24,8 % sociální (celkem 33,8 %)'),
+    radek('Min. záloha OSVČ — sociální (hlavní)', formatKc(S.osvcMinZalohaSoc) + ' / měsíc (od 7/2026; za 1–6/2026 se přeplatek z 5 720 Kč vrací)'),
+    radek('Min. záloha OSVČ — zdravotní (hlavní)', formatKc(S.osvcMinZalohaZdr) + ' / měsíc'),
+    radek('Rozhodná částka — vedlejší činnost', formatKc(S.osvcRozhodnaCastka) + ' zisku / rok'),
+    radek('DPP bez pojistného', 'do ' + formatKc(S.dohody.DPP.odKdyPojistne - 1) + ' / měsíc u jednoho zaměstnavatele'),
+    radek('DPČ bez pojistného', 'do ' + formatKc(S.dohody.DPC.odKdyPojistne - 1) + ' / měsíc u jednoho zaměstnavatele'),
+  ].join('');
+
+  const vyplne = {
+    hranice23Mesic: formatKc(S.hranice23Mesic),
+    hranice23Rok: formatKc(S.hranice23Rok),
+    pulMinimalky: formatKc(S.minimalniMzda / 2),
+    osvcMinZalohaSoc: formatKc(S.osvcMinZalohaSoc),
+    osvcMinZalohaZdr: formatKc(S.osvcMinZalohaZdr),
+    osvcRozhodnaCastka: formatKc(S.osvcRozhodnaCastka),
+    maxVzSocRok: formatKc(S.maxVzSocRok),
+  };
+  document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = vyplne[el.dataset.fill] || '?'; });
+
+  /* ---------- živý přepočet ---------- */
+
+  ['formZam', 'formOsvc'].forEach(id => {
+    $(id).addEventListener('input', () => { spocitejZamestnance(); spocitejOsvc(); });
+    $(id).addEventListener('submit', e => e.preventDefault());
+  });
+  spocitejZamestnance();
+  spocitejOsvc();
+</script>
+</body>
+</html>
