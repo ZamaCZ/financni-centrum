@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /dohodar.html
+
+Sitemap: https://fincentrum.me/sitemap.xml
